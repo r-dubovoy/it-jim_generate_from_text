@@ -184,7 +184,7 @@ class GumbelQuantize(nn.Module):
             # go back to all entries but unused set to zero
             full_zeros[:,self.used,...] = soft_one_hot
             soft_one_hot = full_zeros
-        z_q = einsum('b n h w, n d -> b d h w', soft_one_hot, self.embed.weight)
+        z_q = einsum('b n h w, n d -> b d h w', soft_one_hot, self.embedding.weight)
 
         # + kl divergence to the prior loss
         qy = F.softmax(logits, dim=1)
@@ -206,7 +206,7 @@ class GumbelQuantize(nn.Module):
         if self.remap is not None:
             indices = self.unmap_to_all(indices)
         one_hot = F.one_hot(indices, num_classes=self.n_e).permute(0, 3, 1, 2).float()
-        z_q = einsum('b n h w, n d -> b d h w', one_hot, self.embed.weight)
+        z_q = einsum('b n h w, n d -> b d h w', one_hot, self.embedding.weight)
         return z_q
 
 
