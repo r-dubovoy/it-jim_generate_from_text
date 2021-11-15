@@ -455,7 +455,7 @@ def generate(args, key_frames, max_frames, save_all_iterations, initial_image,
                         loss = train(i, save=False, suffix=suffix)
                     j += 1
                     pbar.update()
-                    if early_stopping and len(loss_history) > 4:
+                    if early_stopping and len(loss_history) > 4 and i > 30:
                         if early_stop(loss):
                             stop_on_next_loop = True
         except KeyboardInterrupt:
