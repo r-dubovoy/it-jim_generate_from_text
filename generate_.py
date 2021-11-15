@@ -202,11 +202,13 @@ def resize_image(image, out_size):
     return image.resize(size, Image.LANCZOS)
 
 
-def generate(args, key_frames, max_frames, text_prompts_series,
-             target_images_series, angle_series, zoom_series,
-             translation_x_series, translation_y_series,
-             iterations_per_frame_series, save_all_iterations, initial_image,
-             working_dir, model_name, early_stopping):
+def generate(args, key_frames, max_frames, save_all_iterations, initial_image,
+             working_dir, model_name, early_stopping, text_prompts, target_images,
+             iterations_per_frame, translation_x=0, translation_y=0, zoom=1, angle=0,
+             text_prompts_series=None,
+             target_images_series=None, angle_series=None, zoom_series=None,
+             translation_x_series=None, translation_y_series=None,
+             iterations_per_frame_series=None):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print('Using device:', device)
     if not key_frames:
