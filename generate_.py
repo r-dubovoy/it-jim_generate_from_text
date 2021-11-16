@@ -458,7 +458,25 @@ def generate(args, key_frames, max_frames, save_all_iterations, initial_image,
                     if early_stopping and len(loss_history) > 4 and i > 30:
                         if early_stop(loss):
                             stop_on_next_loop = True
+
         except KeyboardInterrupt:
             stop_on_next_loop = True
             pass
+
+    for var in ['device', 'model', 'perceptor', 'z']:
+        try:
+            del globals()[var]
+        except:
+            pass
+        try:
+            import gc
+            gc.collect()
+        except:
+            pass
+
+        try:
+            torch.cuda.empty_cache()
+        except:
+            pass
+
     return loss_history
