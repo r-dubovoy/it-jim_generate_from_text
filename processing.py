@@ -56,7 +56,7 @@ def postprocess(keywords_scores: dict, top_words: int = 5):
     stemming = postprocess_stemm(lemmatization)
 
     top_words = len(stemming) if len(stemming) < top_words else top_words
-    keywords = dict(sorted(stemming.items(), key=lambda item: item[1], reverse=True)[:5])
+    keywords = dict(sorted(stemming.items(), key=lambda item: item[1], reverse=True)[:top_words])
 
     return postprocess_norm(keywords)
 
