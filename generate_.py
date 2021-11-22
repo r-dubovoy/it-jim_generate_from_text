@@ -14,7 +14,6 @@ sys.path.append('./taming-transformers')
 
 # Some models include transformers, others need explicit pip install
 
-from IPython import display
 from base64 import b64encode
 from omegaconf import OmegaConf
 from PIL import Image
@@ -239,7 +238,7 @@ def generate(args, key_frames, max_frames, save_all_iterations, initial_image,
 
     ######################## RD CODE ##########################
     loss_history = []
-
+    pbar = tqdm(total=max_frames*iterations_per_frame)
     ######################## RD END  ##########################
 
     def read_image_workaround(path):
@@ -377,18 +376,18 @@ def generate(args, key_frames, max_frames, save_all_iterations, initial_image,
 
             @torch.no_grad()
             def checkin(i, losses):
-                losses_str = ', '.join(f'{loss.item():g}' for loss in losses)
-                tqdm.write(f'i: {i}, loss: {sum(losses).item():g}, losses: {losses_str}')
+                # losses_str = ', '.join(f'{loss.item():g}' for loss in losses)
+                # tqdm.write(f'i: {i}, loss: {sum(losses).item():g}, losses: {losses_str}')
 
                 ######################## RD CODE ##########################
                 loss_history.append(sum(losses))
                 ######################## RD END  ##########################
 
-                out = synth(z)
-                TF.to_pil_image(out[0].cpu()).save('progress.png')
-                add_stegano_data('progress.png')
-                add_xmp_data('progress.png')
-                display.display(display.Image('progress.png'))
+                # out = synth(z)
+                # TF.to_pil_image(out[0].cpu()).save('progress.png')
+                # add_stegano_data('progress.png')
+                # add_xmp_data('progress.png')
+                # display.display(display.Image('progress.png'))
 
             def save_output(i, img, suffix=None):
                 filename = \
@@ -440,24 +439,24 @@ def generate(args, key_frames, max_frames, save_all_iterations, initial_image,
 
             ######################## RD END  ##########################
 
-            with tqdm() as pbar:
-                if iterations_per_frame == 0:
-                    save_output(i, img_0)
-                j = 1
-                while True:
-                    suffix = (str(j) if save_all_iterations else None)
-                    if j >= iterations_per_frame:
-                        loss = train(i, save=True, suffix=suffix)
-                        break
-                    if save_all_iterations:
-                        loss = train(i, save=True, suffix=suffix)
-                    else:
-                        loss = train(i, save=False, suffix=suffix)
-                    j += 1
-                    pbar.update()
-                    if early_stopping and len(loss_history) > 4 and i > 30:
-                        if early_stop(loss):
-                            stop_on_next_loop = True
+            # with tqdm(total = max_frames*iterations_per_frame) as pbar:
+            if iterations_per_frame == 0:
+                save_output(i, img_0)
+            j = 1
+            while True:
+                suffix = (str(j) if save_all_iterations else None)
+                if j >= iterations_per_frame:
+                    loss = train(i, save=True, suffix=suffix)
+                    break
+                if save_all_iterations:
+                    loss = train(i, save=True, suffix=suffix)
+                else:
+                    loss = train(i, save=False, suffix=suffix)
+                j += 1
+                pbar.update()
+                if early_stopping and len(loss_history) > 4 and i > 30:
+                    if early_stop(loss):
+                        stop_on_next_loop = True
 
         except KeyboardInterrupt:
             stop_on_next_loop = True
@@ -473,7 +472,6 @@ def generate(args, key_frames, max_frames, save_all_iterations, initial_image,
             gc.collect()
         except:
             pass
-
         try:
             torch.cuda.empty_cache()
         except:
